@@ -1,0 +1,7 @@
+# Keep local files out
+wallpaper.png
+.DS_Store
+
+# OS junk
+.DS_Store
+Thumbs.db
