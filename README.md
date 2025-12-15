@@ -160,8 +160,11 @@ GitHub is a reliable host, and I wanted to test that Intune could pull and deplo
 
 ## What's Next
 
-This project demonstrates the foundational workflow for cloud-native device management. Natural extensions include:
+This project demonstrates the foundational workflow for Azure-native device management. Natural extensions include:
 
+- Infrastructure as Code (IaC) using Terraform for policy provisioning and tenant replication
+- Python automation using Microsoft Graph API for compliance monitoring and reporting
+- Azure Monitor and Log Analytics for device telemetry 
 - Role-based access control (RBAC) for scoped administrative permissions  
 - Conditional app deployment based on user role (developer tools, admin utilities, etc.)
 - Windows Autopilot deployment profiles for full out-of-box automation
