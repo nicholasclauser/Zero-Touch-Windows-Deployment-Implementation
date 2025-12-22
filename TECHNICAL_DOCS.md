@@ -50,13 +50,13 @@ I established three distinct phases for the script to ensure idempotency:
 ### Handling the Recovery Key
 A major concern was ensuring keys weren't lost during local script execution.
 * **Concern:** I initially debated between using `RecoveryKeyProtector` (Legacy/USB .bek files) and `RecoveryPasswordProtector` (Modern/Entra ID). The `RecoveryKeyProtector` was specifically used in lots of PowerShell examples on Microsoft Learn.
-* **Solution:** Using `-RecoveryPasswordProtector` generates the actual 48-digit BitLocker key. Because the device is Entra-joined, Windows automatically reads this event and stores the in the cloud.
+* **Solution:** Using `-RecoveryPasswordProtector` generates the actual 48-digit BitLocker key. Because the device is Entra-joined, Windows automatically reads this event and stores the key in the cloud.
 
 ### Script Requirements
 * **OS:** Windows 10/11 Enterprise or Pro
 * **Privileges:** Administrator (SYSTEM context when deployed via Intune)
-* **Hardware:** TPM 2 or higher
+* **Hardware:** TPM 2.0 or higher
 * **Modules:** `BitLocker`, `TrustedPlatformModule`
 * **Intune Exit Codes:**
-    * `0`: Success (Compliant)
-    * `1`: Failure (Remediation needed/Failed)
+    * `0`: Success (BitLocker is enabled, or the device is already compliant)
+    * `1`: Failure (Possibly due to TPM missing, BitLocker not being enabled)
