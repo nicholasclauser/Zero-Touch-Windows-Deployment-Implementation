@@ -83,10 +83,10 @@ Designed tiered escalation model:
 
 I assigned compliance to user groups rather than devices so security requirements automatically apply regardless of which computer they use.
 
-### Phase 5: Self-Healing Security (In Progress)
+### Phase 5: Self-Healing Security
 
 **PowerShell Remediation Script**  
-Developing detection and remediation logic to monitor BitLocker status and automatically re-enable if disabled by local admin or system glitch.
+Developed detection and remediation logic to monitor BitLocker status and automatically re-enable if disabled by local admin or system glitch.
 
 **Purpose:** Intune policies check device status on a schedule, leaving gaps where BitLocker could remain disabled. This PowerShell script runs locally on the device to detect and re-enable BitLocker immediately, without waiting for the next policy sync or requiring user or IT intervention. Deployed via Intune and runs silently in the background.
 
@@ -126,9 +126,8 @@ GitHub is a reliable host, and I wanted to test that Intune could pull and deplo
 - BitLocker encryption with silent OOBE
 - Compliance policies with automated escalation and email notifications
 - Documentation with screenshots and configuration evidence
+- PowerShell remediation script ensures BitLocker remains enabled
 
-**In Progress:**
-- PowerShell script for ensuring BitLocker remains enabled
 
 ---
 
@@ -156,11 +155,13 @@ GitHub is a reliable host, and I wanted to test that Intune could pull and deplo
 
 **Initial configuration isn't enough.** Devices can drift over time, and settings can change. Continuous monitoring and automated remediation keep devices secure.
 
+**Don't trust everything you see on the screen.** My PowerShell script displayed "Off" for the BitLocker status, so I wrote my code to look for the word "Off." This was a mistake. It failed silently because it was actually using the number 0, not a string. My intuition as someone who learned to code with Java almost sent me down a rabbithole.
+
 ---
 
 ## What's Next
 
-This project demonstrates the foundational workflow for Azure-native device management. Natural extensions include:
+This project is complete, and demonstrates the foundational workflow for Azure-native device management. Natural extensions include:
 
 - Infrastructure as Code (IaC) using Terraform for policy provisioning and tenant replication
 - Python automation using Microsoft Graph API for compliance monitoring and reporting
