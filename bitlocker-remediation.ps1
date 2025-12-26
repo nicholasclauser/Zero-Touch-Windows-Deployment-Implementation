@@ -53,9 +53,30 @@ try {
         -TpmProtector `
         -RecoveryPasswordProtector `
         -ErrorAction Stop 
-    # Exit if successful
-    Write-Output "BitLocker is successfully enabled."
-    exit 0
+    # don't assume the OS escrowed the key. back it up to Entra ID explicitly and verify.
+    $vol = Get-BitLockerVolume -MountPoint "C:"
+    $recovery = $vol.KeyProtector | Where-Object { $_.KeyProtectorType -eq 'RecoveryPassword' } | Select-Object -First 1
+    if (-not $recovery) {
+        Write-Error "No recovery password protector found after enabling BitLocker."
+        exit 1
+    }
+    try {
+        BackupToAAD-BitLockerKeyProtector -MountPoint "C:" -KeyProtectorId $recovery.KeyProtectorId -ErrorAction Stop
+        Write-Output "Recovery key escrowed to Entra ID."
+    }
+    catch {
+        Write-Error "Failed to back up recovery key to Entra ID: $($_.Exception.Message)"
+        exit 1
+    }
+
+    # only report success once encryption is actually under way
+    $vol = Get-BitLockerVolume -MountPoint "C:"
+    if ($vol.VolumeStatus -in 'EncryptionInProgress','FullyEncrypted') {
+        Write-Output "BitLocker enabled and encrypting (status: $($vol.VolumeStatus))."
+        exit 0
+    }
+    Write-Error "BitLocker did not start encrypting (status: $($vol.VolumeStatus))."
+    exit 1
     }
 }
 catch {
@@ -64,5 +85,11 @@ catch {
     exit 1
 }
 
-Write-Output "Reached end of script. BitLocker enabled; no changes made."
-exit 0
+# reached here means ProtectionStatus was not 0 (already on, suspended, or unknown)
+if ($bitlockerStatus.ProtectionStatus -eq 1) {
+    Write-Output "BitLocker already on. No action needed."
+    exit 0
+}
+
+Write-Error "BitLocker not in a compliant state (ProtectionStatus: $($bitlockerStatus.ProtectionStatus)). Flagging for remediation."
+exit 1
